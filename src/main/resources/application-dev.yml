@@ -2,8 +2,9 @@
 server:
   port: 8081
   servlet:
-    charset: utf-8
-    force: true
+    encoding:
+      charset: utf-8
+      force: true
 
 spring:
   datasource:
@@ -22,10 +23,10 @@ spring:
       '[hibernate.default_batch_fetch_size]': 100
       '[hibernate.format_sql]': true
     show-sql: true
-    output:
-      ansi:
-        enabled: always
+  output:
+    ansi:
+      enabled: always
 
-  logging:
-    level:
-      '[bank]': DEBUG
+logging:
+  level:
+    bank: DEBUG
