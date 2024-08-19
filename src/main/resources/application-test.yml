@@ -26,7 +26,7 @@ spring:
       ansi:
         enabled: always
 
-  logging:
-    level:
-      '[bank]': DEBUG
-      '[org.hibernate.type]': TRACE
+logging:
+  level:
+    bank: DEBUG
+    '[org.hibernate.type]': TRACE
