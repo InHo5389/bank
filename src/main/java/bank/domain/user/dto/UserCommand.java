@@ -10,7 +10,7 @@ public class UserCommand {
 
     @Getter
     @AllArgsConstructor
-    public static class Create{
+    public static class Join {
         private String username;
         private String password;
         private String email;
