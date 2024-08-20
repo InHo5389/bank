@@ -24,13 +24,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true,nullable = true,length = 20)
+    @Column(unique = true,nullable = false,length = 20)
     private String username;
-    @Column(nullable = true,length = 60) // 패스워드 인코딩 고려
+    @Column(nullable = false,length = 60) // 패스워드 인코딩 고려
     private String password;
-    @Column(nullable = true,length = 20)
+    @Column(nullable = false,length = 20)
     private String email;
-    @Column(nullable = true,length = 20)
+    @Column(nullable = false,length = 20)
     private String fullName;
 
     @Enumerated(EnumType.STRING)
