@@ -1,9 +1,9 @@
 package bank.domain.user;
 
+import bank.domain.user.dto.UserResponse;
 import bank.domain.common.exception.CustomGlobalException;
 import bank.domain.common.exception.ErrorType;
 import bank.domain.user.dto.UserCommand;
-import bank.domain.user.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +21,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserDto.Join join(UserCommand.Join command) {
+    public UserResponse.Join join(UserCommand.Join command) {
         // 1. 동일 유저네임 존재 검사
         Optional<User> userOptional = userRepository.findByUsername(command.getUsername());
         if (userOptional.isPresent()){
@@ -32,6 +32,6 @@ public class UserService {
         User savedUser = userRepository.save(command.toEntity(passwordEncoder));
 
         // 3. dto 응답
-        return UserDto.Join.fromEntity(savedUser);
+        return UserResponse.Join.toResponse(savedUser);
     }
 }

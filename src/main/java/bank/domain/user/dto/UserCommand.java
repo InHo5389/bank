@@ -3,12 +3,16 @@ package bank.domain.user.dto;
 import bank.domain.user.User;
 import bank.domain.user.UserEnum;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UserCommand {
 
     @Getter
+    @Builder
+    @NoArgsConstructor
     @AllArgsConstructor
     public static class Join {
         private String username;

@@ -3,22 +3,20 @@ package bank.domain.user.dto;
 import bank.domain.user.User;
 import lombok.*;
 
-public class UserDto {
+public class UserResponse {
 
     @Getter
     @Builder
     @ToString
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Join {
-
-
+    public static class Join{
         private Long id;
         private String username;
         private String fullname;
 
-        public static Join fromEntity(User user) {
-            return Join.builder()
+        public static UserResponse.Join toResponse(User user) {
+            return UserResponse.Join.builder()
                     .id(user.getId())
                     .username(user.getUsername())
                     .fullname(user.getFullName())

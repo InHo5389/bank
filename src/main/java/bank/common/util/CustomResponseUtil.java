@@ -1,6 +1,6 @@
 package bank.common.util;
 
-import bank.controller.common.response.ResponseDto;
+import bank.controller.common.response.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class CustomResponseUtil {
 
     public static void fail(HttpServletResponse response, String message, HttpStatus authException) throws IOException {
         try {
-            ResponseDto<?> responseDto = new ResponseDto<>(-1,message,null);
+            ApiResponse<?> responseDto = new ApiResponse<>(authException,message,null);
             String responseBody = objectMapper.writeValueAsString(responseDto);
             response.setContentType("application/json; charset=utf-8");
             response.setStatus(authException.value());
