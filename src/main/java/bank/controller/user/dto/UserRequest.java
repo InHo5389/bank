@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public class UserRequest {
 
@@ -34,5 +35,15 @@ public class UserRequest {
                     .fullname(fullname)
                     .build();
         }
+    }
+
+    //검증을 못함 왜?
+    // 컨트롤러 가기전 필터를 거쳐서
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Login{
+        private String username;
+        private String password;
     }
 }

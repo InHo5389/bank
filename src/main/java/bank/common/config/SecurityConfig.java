@@ -1,5 +1,7 @@
 package bank.common.config;
 
+import bank.common.config.filter.JwtAuthenticationFilter;
+import bank.common.config.filter.JwtAuthorizationFilter;
 import bank.common.util.CustomResponseUtil;
 import bank.domain.user.UserEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,7 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -35,31 +39,48 @@ public class SecurityConfig {
         log.debug("디버그 : filterChain 빈 등록됨");
 
         http.headers(h -> h.frameOptions(f -> f.sameOrigin()));
-        http.csrf(cf->cf.disable());
-        http.cors(co->co.configurationSource(configurationSource()));
+        http.csrf(cf -> cf.disable());
+        http.cors(co -> co.configurationSource(configurationSource()));
 
-        http.sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-        http.formLogin(f->f.disable());
-        http.httpBasic(hb->hb.disable());
+        http.sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.formLogin(f -> f.disable());
+        http.httpBasic(hb -> hb.disable());
 
-//        http.with(new CustomSecurityFilterManager(), c-> c.build());
+        http.with(new CustomSecurityFilterManager(), c -> c.build());
 
         // 인증 실패
-        http.exceptionHandling(e-> e.authenticationEntryPoint((request, response, authException) -> {
+        http.exceptionHandling(e -> e.authenticationEntryPoint((request, response, authException) -> {
             CustomResponseUtil.fail(response, "로그인을 진행해 주세요", HttpStatus.UNAUTHORIZED);
         }));
 
-        http.exceptionHandling(e-> e.accessDeniedHandler((request, response, accessDeniedException) -> {
+        http.exceptionHandling(e -> e.accessDeniedHandler((request, response, accessDeniedException) -> {
             CustomResponseUtil.fail(response, "권한이 없습니다", HttpStatus.FORBIDDEN);
         }));
 
-        http.authorizeHttpRequests(c->
+        http.authorizeHttpRequests(c ->
+                // 토큰을 만들어서 세션이 만들이지면 인증완료
                 c.requestMatchers("/api/s/**").authenticated()
+                        // role을 보고 판단
                         .requestMatchers("/api/admin/**").hasRole("" + UserEnum.ADMIN)
                         .anyRequest().permitAll()
         );
 
         return http.build();
+    }
+
+    public class CustomSecurityFilterManager extends AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
+        @Override
+        public void configure(HttpSecurity builder) throws Exception {
+            // AuthenticationManager가 없으면 강제 세션 로그인을 못해서 만들어줌
+            AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
+            builder.addFilter(new JwtAuthenticationFilter(authenticationManager));
+            builder.addFilter(new JwtAuthorizationFilter(authenticationManager));
+            super.configure(builder);
+        }
+
+        public HttpSecurity build() {
+            return getBuilder();
+        }
     }
 
     public CorsConfigurationSource configurationSource() {
