@@ -3,7 +3,7 @@ package bank.domain.user;
 import bank.common.config.dummy.DummyObject;
 import bank.domain.common.exception.CustomGlobalException;
 import bank.domain.user.dto.UserCommand;
-import bank.domain.user.dto.UserDto;
+import bank.domain.user.dto.UserResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,9 +49,9 @@ class UserServiceTest extends DummyObject {
         Mockito.when(userRepository.save(any()))
                 .thenReturn(ssar);
         //when
-        UserDto.Join joinDto = userService.join(command);
+        UserResponse.Join joinResponse = userService.join(command);
         //then
-        assertThat(joinDto).extracting("id","username","fullname")
+        assertThat(joinResponse).extracting("id","username","fullname")
                 .containsExactlyInAnyOrder(1L,"ssar","쌀");
     }
 
