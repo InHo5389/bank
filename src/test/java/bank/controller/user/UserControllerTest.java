@@ -3,11 +3,9 @@ package bank.controller.user;
 import bank.common.config.SecurityConfig;
 import bank.common.config.dummy.DummyObject;
 import bank.controller.user.dto.UserRequest;
-import bank.domain.user.User;
 import bank.domain.user.UserRepository;
 import bank.domain.user.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +28,6 @@ class UserControllerTest extends DummyObject {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @MockBean
     private UserService userService;
