@@ -61,7 +61,7 @@ public class SecurityConfig {
                 // 토큰을 만들어서 세션이 만들이지면 인증완료
                 c.requestMatchers("/api/s/**").authenticated()
                         // role을 보고 판단
-                        .requestMatchers("/api/admin/**").hasRole("" + UserEnum.ADMIN)
+                        .requestMatchers("/api/admin/**").hasRole(UserEnum.ADMIN+"")
                         .anyRequest().permitAll()
         );
 

@@ -29,9 +29,6 @@ class UserControllerTest extends DummyObject {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private UserRepository userRepository;
-
     @MockBean
     private UserService userService;
 
