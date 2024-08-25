@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 public class DummyObject {
 
-    protected User newUser(String username,String fullname){
+    public User newUser(String username,String fullname){
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encodePassword = passwordEncoder.encode("1234");
         return User.builder()
@@ -21,7 +21,7 @@ public class DummyObject {
                 .build();
     }
 
-    protected User newMockUser(long id, String username, String fullname){
+    public User newMockUser(long id, String username, String fullname){
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String encodePassword = passwordEncoder.encode("1234");
         return User.builder()

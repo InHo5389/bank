@@ -28,7 +28,7 @@ public class Account {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    @Column(unique = true,nullable = false,length = 20)
+    @Column(unique = true,nullable = false,length = 4)
     private Long number;
     @Column(nullable = false,length = 4)
     private Long password;
