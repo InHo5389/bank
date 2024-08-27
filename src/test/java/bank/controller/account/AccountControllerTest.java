@@ -76,4 +76,20 @@ class AccountControllerTest extends DummyObject {
                 .andExpect(jsonPath("$.data.number").value(number));
     }
 
+    @Test
+    @DisplayName("본인 계좌 목록을 보여준다.")
+    @WithUserDetails(value = "ssar", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void test() throws Exception {
+        //given
+        //when
+        //then
+        mockMvc.perform(get("/api/s/account/login-user")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.userId").value(1L))
+                .andExpect(jsonPath("$.data.fullname").value("쌀"))
+                .andExpect(jsonPath("$.data.accounts").isArray());
+    }
+
 }

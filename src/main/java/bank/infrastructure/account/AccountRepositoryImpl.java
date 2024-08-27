@@ -5,6 +5,7 @@ import bank.domain.account.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -21,5 +22,10 @@ public class AccountRepositoryImpl implements AccountRepository {
     @Override
     public Optional<Account> findByNumber(Long number) {
         return accountJpaRepository.findByNumber(number);
+    }
+
+    @Override
+    public List<Account> findByUserId(Long userId) {
+        return accountJpaRepository.findByUserId(userId);
     }
 }

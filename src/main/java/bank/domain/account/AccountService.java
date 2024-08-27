@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,5 +36,12 @@ public class AccountService {
         Account account = accountRepository.save(command.toEntity(user));
         // dto 응답
         return new AccountResponse.Create(account);
+    }
+
+    public AccountResponse.GetByUser getByUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomGlobalException(ErrorType.NOT_FOUND_USER));
+        List<Account> accountList = accountRepository.findByUserId(userId);
+        return new AccountResponse.GetByUser(user,accountList);
     }
 }

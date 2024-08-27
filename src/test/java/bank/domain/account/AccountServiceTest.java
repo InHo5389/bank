@@ -7,6 +7,7 @@ import bank.domain.account.dto.AccountResponse;
 import bank.domain.user.User;
 import bank.domain.user.UserRepository;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -56,6 +59,41 @@ class AccountServiceTest extends DummyObject {
         Assertions.assertThat(account)
                 .extracting("accountId", "number")
                 .containsExactlyInAnyOrder(accountId,number);
+    }
+
+    @Test
+    @DisplayName("로그인된 유저 id에 대한 계좌 목록을 보여준다.")
+    void getByUser() {
+        //given
+        long userId = 1L;
+        User user = newMockUser(userId, "inho", "핸드폰");
+        when(userRepository.findById(userId))
+                .thenReturn(Optional.of(user));
+        List<Account> accountList = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            accountList.add(newMockAccount(1L, Long.valueOf("111" + i), user, 1000L));
+        }
+        when(accountRepository.findByUserId(userId))
+                .thenReturn(accountList);
+        //when
+        AccountResponse.GetByUser accountListByUser = accountService.getByUser(userId);
+        //then
+        Assertions.assertThat(accountListByUser)
+                .extracting("userId", "fullname")
+                .containsExactly(1L, "핸드폰");
+
+        List<AccountResponse.GetByUser.AccountDto> accountDto = accountListByUser.getAccounts();
+
+        Assertions.assertThat(accountDto)
+                .hasSize(5)
+                .extracting("accountId", "number", "balance")
+                .containsExactly(
+                        Tuple.tuple(1L, 1110L, 1000L),
+                        Tuple.tuple(1L, 1111L, 1000L),
+                        Tuple.tuple(1L, 1112L, 1000L),
+                        Tuple.tuple(1L, 1113L, 1000L),
+                        Tuple.tuple(1L, 1114L, 1000L)
+                );
     }
 
 }
