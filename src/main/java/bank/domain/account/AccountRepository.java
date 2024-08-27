@@ -1,4 +1,9 @@
 package bank.domain.account;
 
+import java.util.Optional;
+
 public interface AccountRepository {
+
+    Account save(Account account);
+    Optional<Account> findByNumber(Long number);
 }
