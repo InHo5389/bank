@@ -69,4 +69,5 @@ class UserServiceTest extends DummyObject {
                 .isInstanceOf(CustomGlobalException.class)
                 .hasMessage("중복된 아이디입니다. 다른 아이디를 사용해 주세요.");
     }
+
 }

@@ -3,11 +3,13 @@ package bank.controller.account.dto;
 import bank.domain.account.dto.AccountCommand;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 public class AccountRequest {
 
     @Getter
+    @AllArgsConstructor
     public static class Create {
 
         @NotNull
