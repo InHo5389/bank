@@ -5,14 +5,13 @@ import bank.controller.account.dto.AccountRequest;
 import bank.controller.common.response.ApiResponse;
 import bank.domain.account.AccountService;
 import bank.domain.account.dto.AccountResponse;
+import bank.domain.common.exception.CustomGlobalException;
+import bank.domain.common.exception.ErrorType;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -24,8 +23,15 @@ public class AccountController {
 
     @PostMapping("/s/account")
     public ApiResponse<AccountResponse.Create> create(@Valid @RequestBody AccountRequest.Create request,
-                                                      @AuthenticationPrincipal LoginUser loginUser){
+                                                      @AuthenticationPrincipal LoginUser loginUser) {
         AccountResponse.Create response = accountService.createAccount(request.toCommand(), loginUser.getUser().getId());
         return ApiResponse.ok(response);
+    }
+
+    @GetMapping("/s/account/login-user")
+    public ApiResponse<AccountResponse.GetByUser> getByUser(@AuthenticationPrincipal LoginUser loginUser) {
+
+        AccountResponse.GetByUser accounts = accountService.getByUser(loginUser.getUser().getId());
+        return ApiResponse.ok(accounts);
     }
 }
