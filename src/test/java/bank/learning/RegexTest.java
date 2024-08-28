@@ -105,4 +105,52 @@ public class RegexTest {
         //then
         System.out.println(result);
     }
+
+    @Test
+    @DisplayName("")
+    void account_gubun_test(){
+        //given
+        String gubun = "DEPOSIT";
+        boolean result =
+                Pattern.matches("^(DEPOSIT)$", gubun);
+        //when
+        //then
+        System.out.println(result);
+    }
+
+    @Test
+    @DisplayName("")
+    void account_gubun_test_fail(){
+        //given
+        String gubun = "DEPOSIT1";
+        boolean result =
+                Pattern.matches("^(DEPOSIT)$", gubun);
+        //when
+        //then
+        System.out.println(result);
+    }
+
+    @Test
+    @DisplayName("")
+    void account_tel_test(){
+        //given
+        String tel = "01012345678";
+        boolean result =
+                Pattern.matches("^[0-9]{3}[0-9]{4}[0-9]{4}", tel);
+        //when
+        //then
+        System.out.println(result);
+    }
+
+    @Test
+    @DisplayName("")
+    void account_tel_test_fail(){
+        //given
+        String tel = "010123456781";
+        boolean result =
+                Pattern.matches("^[0-9]{3}[0-9]{4}[0-9]{4}", tel);
+        //when
+        //then
+        System.out.println(result);
+    }
 }

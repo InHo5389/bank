@@ -28,4 +28,9 @@ public class AccountRepositoryImpl implements AccountRepository {
     public List<Account> findByUserId(Long userId) {
         return accountJpaRepository.findByUserId(userId);
     }
+
+    @Override
+    public void deleteById(Long accountId) {
+        accountJpaRepository.deleteById(accountId);
+    }
 }

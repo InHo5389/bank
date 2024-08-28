@@ -13,7 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "transaction_td")
+@Table(name = "transaction_tb")
 @Entity
 @Getter
 @Builder
@@ -38,7 +38,7 @@ public class Transaction {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private TransactionEnum status;
+    private TransactionEnum gubun;
 
     private String sender;
     private String receiver;

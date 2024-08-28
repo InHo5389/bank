@@ -4,6 +4,7 @@ import bank.common.config.dummy.DummyObject;
 import bank.controller.account.dto.AccountRequest;
 import bank.domain.account.dto.AccountCommand;
 import bank.domain.account.dto.AccountResponse;
+import bank.domain.common.exception.CustomGlobalException;
 import bank.domain.user.User;
 import bank.domain.user.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -40,25 +41,25 @@ class AccountServiceTest extends DummyObject {
 
     @Test
     @DisplayName("등록된 계자 번호가 없으면 계좌를 등록할 수 있다.")
-    void createAccount(){
+    void createAccount() {
         //given
         long number = 1111L;
-        AccountCommand.Create command = new AccountCommand.Create(number,1234L);
+        AccountCommand.Create command = new AccountCommand.Create(number, 1234L);
         long userId = 1L;
-        long accountId= 1L;
+        long accountId = 1L;
         User user = newMockUser(userId, "ssar", "쌀");
         when(userRepository.findById(any()))
                 .thenReturn(Optional.of(user));
         when(accountRepository.findByNumber(number))
                 .thenReturn(Optional.empty());
         when(accountRepository.save(any()))
-                .thenReturn(newMockAccount(accountId,number,user,1000L));
+                .thenReturn(newMockAccount(accountId, number, user, 1000L));
         //when
         //then
         AccountResponse.Create account = accountService.createAccount(command, userId);
         Assertions.assertThat(account)
                 .extracting("accountId", "number")
-                .containsExactlyInAnyOrder(accountId,number);
+                .containsExactlyInAnyOrder(accountId, number);
     }
 
     @Test
@@ -94,6 +95,24 @@ class AccountServiceTest extends DummyObject {
                         Tuple.tuple(1L, 1113L, 1000L),
                         Tuple.tuple(1L, 1114L, 1000L)
                 );
+    }
+
+    @Test
+    @DisplayName("계좌 확인시 소유자가 아닐 경우 예외가 발생한다.")
+    void delete() {
+        //given
+        long userId = 1L;
+        long number = 1111L;
+
+        User user = newMockUser(2L, "ssar", "쌀");
+        Account account = newMockAccount(1L, number, user, 1000L);
+        when(accountRepository.findByNumber(account.getNumber()))
+                .thenReturn(Optional.of(account));
+        //when
+        Assertions.assertThatThrownBy(() -> accountService.delete(number, userId))
+                .hasMessage("해당 계좌 소유자가 아닙니다.")
+                .isInstanceOf(CustomGlobalException.class);
+        //then
     }
 
 }

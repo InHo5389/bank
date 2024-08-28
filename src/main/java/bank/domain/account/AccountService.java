@@ -4,6 +4,9 @@ import bank.domain.account.dto.AccountCommand;
 import bank.domain.account.dto.AccountResponse;
 import bank.domain.common.exception.CustomGlobalException;
 import bank.domain.common.exception.ErrorType;
+import bank.domain.transaction.Transaction;
+import bank.domain.transaction.TransactionEnum;
+import bank.domain.transaction.TransactionRepository;
 import bank.domain.user.User;
 import bank.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ public class AccountService {
 
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
+    private final TransactionRepository transactionRepository;
 
     @Transactional
     public AccountResponse.Create createAccount(AccountCommand.Create command, Long userId) {
@@ -29,7 +33,7 @@ public class AccountService {
                 .orElseThrow(() -> new CustomGlobalException(ErrorType.NOT_FOUND_USER));
         // 해당 계좌가 db에 있는 중복여부 체크
         Optional<Account> optionalAccount = accountRepository.findByNumber(command.getNumber());
-        if (optionalAccount.isPresent()){
+        if (optionalAccount.isPresent()) {
             throw new CustomGlobalException(ErrorType.DUPLICATE_ACCOUNT_NUMBER);
         }
         // 계좌 등록
@@ -42,6 +46,37 @@ public class AccountService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomGlobalException(ErrorType.NOT_FOUND_USER));
         List<Account> accountList = accountRepository.findByUserId(userId);
-        return new AccountResponse.GetByUser(user,accountList);
+        return new AccountResponse.GetByUser(user, accountList);
+    }
+
+    @Transactional
+    public void delete(Long number, Long userId) {
+        Account account = accountRepository.findByNumber(number)
+                .orElseThrow(() -> new CustomGlobalException(ErrorType.NOT_FOUND_ACCOUNT));
+        account.checkOwner(userId);
+        accountRepository.deleteById(account.getId());
+    }
+
+    @Transactional
+    public AccountResponse.Deposit deposit(AccountCommand.Deposit command) {
+        Account account = accountRepository.findByNumber(command.getNumber())
+                .orElseThrow(() -> new CustomGlobalException(ErrorType.NOT_FOUND_ACCOUNT));
+
+        account.deposit(command.getAmount());
+
+        Transaction transaction = Transaction.builder()
+                .depositAccount(account)
+                .withdrawAccount(null)
+                .depositAccountBalance(account.getBalance())
+                .withdrawAccountBalance(null)
+                .amount(command.getAmount())
+                .gubun(TransactionEnum.DEPOSIT)
+                .sender("ATM")
+                .receiver(account.getNumber()+"")
+                .tel(command.getTel())
+                .build();
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+        return new AccountResponse.Deposit(account,savedTransaction);
     }
 }

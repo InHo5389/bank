@@ -1,7 +1,10 @@
 package bank.domain.account.dto;
 
+import bank.common.util.DateUtil;
 import bank.domain.account.Account;
+import bank.domain.transaction.Transaction;
 import bank.domain.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -46,6 +49,44 @@ public class AccountResponse {
                 this.accountId = account.getId();
                 this.number = account.getNumber();
                 this.balance = account.getBalance();
+            }
+        }
+    }
+
+    @Getter
+    public static class Deposit{
+        private Long accountId;
+        private Long number;
+        private TransactionDto transaction;
+
+        public Deposit(Account account, Transaction transaction) {
+            this.accountId = account.getId();
+            this.number = account.getNumber();
+            this.transaction = new TransactionDto(transaction);
+        }
+
+        @Getter
+        public class TransactionDto{
+            private Long id;
+            private String gubun;
+            private String sender;
+            private String receiver;
+            private Long amount;
+
+            @JsonIgnore
+            private Long depositAccountBalance;
+            private String tel;
+            private String createdAt;
+
+            public TransactionDto(Transaction transaction) {
+                this.id = transaction.getId();
+                this.gubun = transaction.getGubun().getValue();
+                this.sender = transaction.getSender();
+                this.receiver = transaction.getReceiver();
+                this.amount = transaction.getAmount();
+                this.depositAccountBalance = transaction.getDepositAccountBalance();
+                this.tel = transaction.getTel();
+                this.createdAt = DateUtil.toStringFormat(transaction.getCreatedAt());
             }
         }
     }

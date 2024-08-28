@@ -27,4 +27,15 @@ public class AccountCommand {
                     .build();
         }
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Deposit{
+        private Long number;
+        private Long amount;
+        private String gubun;
+        private String tel;
+    }
 }
