@@ -8,4 +8,5 @@ public interface AccountRepository {
     Account save(Account account);
     Optional<Account> findByNumber(Long number);
     List<Account> findByUserId(Long userId);
+    void deleteById(Long accountId);
 }

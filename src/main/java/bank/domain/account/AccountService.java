@@ -29,7 +29,7 @@ public class AccountService {
                 .orElseThrow(() -> new CustomGlobalException(ErrorType.NOT_FOUND_USER));
         // 해당 계좌가 db에 있는 중복여부 체크
         Optional<Account> optionalAccount = accountRepository.findByNumber(command.getNumber());
-        if (optionalAccount.isPresent()){
+        if (optionalAccount.isPresent()) {
             throw new CustomGlobalException(ErrorType.DUPLICATE_ACCOUNT_NUMBER);
         }
         // 계좌 등록
@@ -42,6 +42,14 @@ public class AccountService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomGlobalException(ErrorType.NOT_FOUND_USER));
         List<Account> accountList = accountRepository.findByUserId(userId);
-        return new AccountResponse.GetByUser(user,accountList);
+        return new AccountResponse.GetByUser(user, accountList);
+    }
+
+    @Transactional
+    public void delete(Long number, Long userId) {
+        Account account = accountRepository.findByNumber(number)
+                .orElseThrow(() -> new CustomGlobalException(ErrorType.NOT_FOUND_ACCOUNT));
+        account.checkOwner(userId);
+        accountRepository.deleteById(account.getId());
     }
 }

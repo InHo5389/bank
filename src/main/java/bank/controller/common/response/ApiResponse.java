@@ -29,7 +29,7 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> ok(T data) {
         return new ApiResponse<>(HttpStatus.OK, HttpStatus.OK.name(), data);
     }
-    public static <T> ApiResponse<T> ok(T data,HttpStatus status) {
-        return new ApiResponse<>(status, status.name(), data);
+    public static <T> ApiResponse<T> ok(String message,T data) {
+        return new ApiResponse<>(HttpStatus.OK, message, data);
     }
 }

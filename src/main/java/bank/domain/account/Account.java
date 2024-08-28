@@ -1,11 +1,15 @@
 package bank.domain.account;
 
+import bank.domain.common.exception.CustomGlobalException;
+import bank.domain.common.exception.ErrorType;
 import bank.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -19,6 +23,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql="UPDATE account_tb Set deleted = true where id = ?")
+@SQLRestriction("deleted is false")
 public class Account {
 
     @Id
@@ -42,4 +48,11 @@ public class Account {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+    private boolean deleted;
+
+    public void checkOwner(Long userId){
+        if (user.getId() != userId){
+            throw new CustomGlobalException(ErrorType.INVALID_ACCOUNT_OWNER);
+        }
+    }
 }
