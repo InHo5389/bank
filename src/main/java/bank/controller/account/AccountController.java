@@ -43,4 +43,9 @@ public class AccountController {
 
         return ApiResponse.ok("계좌 삭제 완료",null);
     }
+
+    @PostMapping("/account/deposit")
+    public ApiResponse<AccountResponse.Deposit> deposit(@Valid @RequestBody AccountRequest.Deposit request){
+        return ApiResponse.ok("입금 완료",accountService.deposit(request.toCommand()));
+    }
 }
