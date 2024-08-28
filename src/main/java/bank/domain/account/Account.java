@@ -55,4 +55,8 @@ public class Account {
             throw new CustomGlobalException(ErrorType.INVALID_ACCOUNT_OWNER);
         }
     }
+
+    public void deposit(Long amount) {
+        this.balance += amount;
+    }
 }

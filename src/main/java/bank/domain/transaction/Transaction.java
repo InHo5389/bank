@@ -38,7 +38,7 @@ public class Transaction {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private TransactionEnum status;
+    private TransactionEnum gubun;
 
     private String sender;
     private String receiver;
