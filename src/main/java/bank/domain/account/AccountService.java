@@ -97,12 +97,46 @@ public class AccountService {
                 .depositAccountBalance(null)
                 .amount(command.getAmount())
                 .gubun(TransactionEnum.WITHDRAW)
-                .sender(withdrawAccount.getNumber()+"")
+                .sender(withdrawAccount.getNumber() + "")
                 .receiver("ATM")
                 .build();
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-        return new AccountResponse.Withdraw(withdrawAccount,savedTransaction);
+        return new AccountResponse.Withdraw(withdrawAccount, savedTransaction);
+    }
+
+    @Transactional
+    public AccountResponse.Transfer transfer(AccountCommand.Transfer command, Long userId) {
+        if (command.getWithdrawNumber().longValue() == command.getDepositNumber().longValue()) {
+            throw new CustomGlobalException(ErrorType.SAME_ACCOUNT_NUMBER);
+        }
+
+        Account withdrawAccount = accountRepository.findByNumber(command.getWithdrawNumber())
+                .orElseThrow(() -> new CustomGlobalException(ErrorType.NOT_FOUND_WITHDRAW_ACCOUNT));
+        Account depositAccount = accountRepository.findByNumber(command.getDepositNumber())
+                .orElseThrow(() -> new CustomGlobalException(ErrorType.NOT_FOUND_DEPOSIT_ACCOUNT));
+        // 출금 소유자 확인(로그인한 사람과 동일한지)
+        withdrawAccount.checkOwner(userId);
+        withdrawAccount.checkPassword(command.getWithdrawPassword());
+
+        // 이체하기
+        withdrawAccount.withdraw(command.getAmount());
+        depositAccount.deposit(command.getAmount());
+        // 내 계좌에서 ATM으로 이체
+        Transaction transaction = Transaction.builder()
+                .withdrawAccount(withdrawAccount)
+                .depositAccount(depositAccount)
+                .withdrawAccountBalance(withdrawAccount.getBalance())
+                .depositAccountBalance(depositAccount.getBalance())
+                .amount(command.getAmount())
+                .gubun(TransactionEnum.TRANSFER)
+                .sender(command.getWithdrawNumber() + "")
+                .receiver(command.getDepositNumber()+"")
+                .build();
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        return new AccountResponse.Transfer(withdrawAccount, savedTransaction);
     }
 }

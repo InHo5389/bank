@@ -55,4 +55,10 @@ public class AccountController {
 
         return ApiResponse.ok("출금 완료", accountService.withdraw(request.toCommand(),loginUser.getUser().getId()));
     }
+
+    @PostMapping("/s/account/transfer")
+    public ApiResponse<AccountResponse.Transfer> transfer(@Valid @RequestBody AccountRequest.Transfer request,
+                                                          @AuthenticationPrincipal LoginUser loginUser){
+        return ApiResponse.ok("이체 완료",accountService.transfer(request.toCommand(),loginUser.getUser().getId()));
+    }
 }

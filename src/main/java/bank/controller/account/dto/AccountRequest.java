@@ -84,4 +84,36 @@ public class AccountRequest {
                     .build();
         }
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Transfer{
+        @NotNull
+        @Digits(integer = 4, fraction = 4)
+        private Long withdrawNumber;
+        @NotNull
+        @Digits(integer = 4, fraction = 4)
+        private Long depositNumber;
+        @NotNull
+        @Digits(integer = 4, fraction = 4)
+        private Long withdrawPassword;
+        @NotNull
+        @Positive(message = "1원 이상 입금하실수 있습니다.")
+        private Long amount;
+        @NotEmpty
+        @Pattern(regexp = "^(TRANSFER)$")
+        private String gubun;
+
+        public AccountCommand.Transfer toCommand(){
+            return AccountCommand.Transfer.builder()
+                    .withdrawNumber(withdrawNumber)
+                    .depositNumber(depositNumber)
+                    .withdrawPassword(withdrawPassword)
+                    .amount(amount)
+                    .gubun(gubun)
+                    .build();
+        }
+    }
 }

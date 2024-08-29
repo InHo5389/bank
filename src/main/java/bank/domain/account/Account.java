@@ -66,10 +66,14 @@ public class Account {
         }
     }
 
-    public void withdraw(Long amount) {
+    public void checkBalance(Long amount){
         if (amount > this.balance){
             throw new CustomGlobalException(ErrorType.NOT_ENOUGH_BALANCE);
         }
+    }
+
+    public void withdraw(Long amount) {
+        checkBalance(amount);
         this.balance -= amount;
     }
 }

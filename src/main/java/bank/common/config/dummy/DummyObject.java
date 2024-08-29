@@ -106,4 +106,22 @@ public class DummyObject {
                 .updatedAt(LocalDateTime.now())
                 .build();
     }
+
+    protected Transaction newMockTransferTransaction(Long id, Account withdrawAccount,Account depositAccount, Long amount) {
+        withdrawAccount.withdraw(amount);
+        depositAccount.deposit(amount);
+        return Transaction.builder()
+                .id(id)
+                .withdrawAccount(withdrawAccount)
+                .depositAccount(depositAccount)
+                .withdrawAccountBalance(withdrawAccount.getBalance())
+                .depositAccountBalance(null)
+                .amount(amount)
+                .gubun(TransactionEnum.TRANSFER)
+                .sender(withdrawAccount.getNumber() + "")
+                .receiver(depositAccount.getNumber() + "")
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+    }
 }

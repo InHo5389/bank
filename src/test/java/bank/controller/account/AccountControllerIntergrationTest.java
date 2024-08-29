@@ -2,6 +2,7 @@ package bank.controller.account;
 
 import bank.common.config.dummy.DummyObject;
 import bank.controller.account.dto.AccountRequest;
+import bank.domain.account.Account;
 import bank.domain.account.AccountRepository;
 import bank.domain.account.dto.AccountCommand;
 import bank.domain.user.User;
@@ -169,6 +170,30 @@ class AccountControllerIntergrationTest extends DummyObject {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("message").value("출금 완료"));
+    }
+
+    @Test
+    @DisplayName("출금 계좌에 돈이 넉넉할 경우 이체를 할 수 있다.")
+    @WithUserDetails(value = "ssar", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void transfer() throws Exception {
+        //given
+        long withdrawNumber = 1111L;
+        long depositNumber = 2222L;
+        long withdrawPassword = 1234L;
+        long amount = 100L;
+
+        AccountRequest.Transfer request = new AccountRequest.Transfer(
+                withdrawNumber, depositNumber, withdrawPassword, amount, "TRANSFER");
+        String requestBody = objectMapper.writeValueAsString(request);
+        //when
+        //then
+
+        mockMvc.perform(post("/api/s/account/transfer")
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("이체 완료"));
     }
 
 }

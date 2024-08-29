@@ -174,4 +174,45 @@ class AccountServiceTest extends DummyObject {
                 .extracting("accountId", "number", "transaction.amount")
                 .containsExactly(1L, number, amount);
     }
+
+    @Test
+    @DisplayName("계자이체를 할수 있다.")
+    void transfer() {
+        //given
+        long userId = 1L;
+        long withdrawNumber = 1111L;
+        long depositNumber = 1112L;
+        long withdrawPassword = 1234L;
+        long depositPassword = 4321L;
+        long amount = 100L;
+
+        AccountCommand.Transfer command = new AccountCommand.Transfer(
+                withdrawNumber,depositNumber, withdrawPassword, amount, "TRANSFER");
+
+        User user1 = newMockUser(2L, "ssar", "쌀");
+        Account depositAccount = Account.builder().id(1L).user(user1).number(depositNumber).password(depositPassword).balance(1000L).build();
+        User user2 = newMockUser(1L, "cos", "코스");
+        Account withdrawAccount = Account.builder().id(2L).user(user2).number(withdrawNumber).password(withdrawPassword).balance(1000L).build();
+        when(accountRepository.findByNumber(command.getWithdrawNumber()))
+                .thenReturn(Optional.of(withdrawAccount));
+        when(accountRepository.findByNumber(command.getDepositNumber()))
+                .thenReturn(Optional.of(depositAccount));
+
+
+        Account depositAccount2 = Account.builder().id(2L).user(user1).number(depositNumber).password(depositPassword).balance(1000L).build();
+        Account withdrawAccount2 = Account.builder().id(1L).user(user2).number(withdrawNumber).password(withdrawPassword).balance(1000L).build();
+
+        Transaction transaction = newMockTransferTransaction(1L,withdrawAccount2,depositAccount2, amount);
+        when(transactionRepository.save(any())).thenReturn(transaction);
+        //when
+        AccountResponse.Transfer response = accountService.transfer(command, userId);
+        //then
+        Assertions.assertThat(withdrawAccount2.getBalance()).isEqualTo(900L);
+        Assertions.assertThat(depositAccount2.getBalance()).isEqualTo(1100L);
+        Assertions.assertThat(transaction.getWithdrawAccountBalance()).isEqualTo(900L);
+        Assertions.assertThat(response)
+                .extracting("accountId", "number", "transaction.amount")
+                .containsExactly(2L, withdrawNumber, amount);
+    }
+
 }
