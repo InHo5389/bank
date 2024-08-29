@@ -38,4 +38,16 @@ public class AccountCommand {
         private String gubun;
         private String tel;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Withdraw{
+        private Long number;
+        private Long password;
+        private Long amount;
+        private String gubun;
+    }
+
 }

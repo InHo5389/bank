@@ -3,7 +3,9 @@ package bank.controller.account.dto;
 import bank.domain.account.dto.AccountCommand;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 public class AccountRequest {
 
@@ -52,6 +54,33 @@ public class AccountRequest {
                     .amount(amount)
                     .gubun(gubun)
                     .tel(tel)
+                    .build();
+        }
+    }
+
+
+    @Getter
+    @AllArgsConstructor
+    public static class Withdraw{
+        @NotNull
+        @Digits(integer = 4, fraction = 4)
+        private Long number;
+        @NotNull
+        @Digits(integer = 4, fraction = 4)
+        private Long password;
+        @NotNull
+        @Positive(message = "1원 이상 입금하실수 있습니다.")
+        private Long amount;
+        @NotEmpty
+        @Pattern(regexp = "^(WITHDRAW)$")
+        private String gubun;
+
+        public AccountCommand.Withdraw toCommand(){
+            return AccountCommand.Withdraw.builder()
+                    .number(number)
+                    .password(password)
+                    .amount(amount)
+                    .gubun(gubun)
                     .build();
         }
     }

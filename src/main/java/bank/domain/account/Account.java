@@ -59,4 +59,17 @@ public class Account {
     public void deposit(Long amount) {
         this.balance += amount;
     }
+
+    public void checkPassword(Long password) {
+        if (this.password.longValue() != password.longValue()){
+            throw new CustomGlobalException(ErrorType.INVALID_USER_PASSWORD);
+        }
+    }
+
+    public void withdraw(Long amount) {
+        if (amount > this.balance){
+            throw new CustomGlobalException(ErrorType.NOT_ENOUGH_BALANCE);
+        }
+        this.balance -= amount;
+    }
 }

@@ -65,18 +65,44 @@ public class AccountService {
         account.deposit(command.getAmount());
 
         Transaction transaction = Transaction.builder()
-                .depositAccount(account)
                 .withdrawAccount(null)
-                .depositAccountBalance(account.getBalance())
+                .depositAccount(account)
                 .withdrawAccountBalance(null)
+                .depositAccountBalance(account.getBalance())
                 .amount(command.getAmount())
                 .gubun(TransactionEnum.DEPOSIT)
                 .sender("ATM")
-                .receiver(account.getNumber()+"")
+                .receiver(account.getNumber() + "")
                 .tel(command.getTel())
                 .build();
 
         Transaction savedTransaction = transactionRepository.save(transaction);
-        return new AccountResponse.Deposit(account,savedTransaction);
+        return new AccountResponse.Deposit(account, savedTransaction);
+    }
+
+    @Transactional
+    public AccountResponse.Withdraw withdraw(AccountCommand.Withdraw command, Long userId) {
+        Account withdrawAccount = accountRepository.findByNumber(command.getNumber())
+                .orElseThrow(() -> new CustomGlobalException(ErrorType.NOT_FOUND_ACCOUNT));
+        // 출금 소유자 확인(로그인한 사람과 동일한지)
+        withdrawAccount.checkOwner(userId);
+        withdrawAccount.checkPassword(command.getPassword());
+        withdrawAccount.withdraw(command.getAmount());
+
+        // 내 계좌에서 ATM으로 출금(돈 뽑기)
+        Transaction transaction = Transaction.builder()
+                .withdrawAccount(withdrawAccount)
+                .depositAccount(null)
+                .withdrawAccountBalance(withdrawAccount.getBalance())
+                .depositAccountBalance(null)
+                .amount(command.getAmount())
+                .gubun(TransactionEnum.WITHDRAW)
+                .sender(withdrawAccount.getNumber()+"")
+                .receiver("ATM")
+                .build();
+
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        return new AccountResponse.Withdraw(withdrawAccount,savedTransaction);
     }
 }

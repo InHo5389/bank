@@ -41,11 +41,18 @@ public class AccountController {
                                            @AuthenticationPrincipal LoginUser loginUser) {
         accountService.delete(number, loginUser.getUser().getId());
 
-        return ApiResponse.ok("계좌 삭제 완료",null);
+        return ApiResponse.ok("계좌 삭제 완료", null);
     }
 
     @PostMapping("/account/deposit")
-    public ApiResponse<AccountResponse.Deposit> deposit(@Valid @RequestBody AccountRequest.Deposit request){
-        return ApiResponse.ok("입금 완료",accountService.deposit(request.toCommand()));
+    public ApiResponse<AccountResponse.Deposit> deposit(@Valid @RequestBody AccountRequest.Deposit request) {
+        return ApiResponse.ok("입금 완료", accountService.deposit(request.toCommand()));
+    }
+
+    @PostMapping("/s/account/withdraw")
+    public ApiResponse<AccountResponse.Withdraw> withdraw(@Valid @RequestBody AccountRequest.Withdraw request,
+                                                          @AuthenticationPrincipal LoginUser loginUser) {
+
+        return ApiResponse.ok("출금 완료", accountService.withdraw(request.toCommand(),loginUser.getUser().getId()));
     }
 }

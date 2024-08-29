@@ -1,10 +1,11 @@
 package bank.domain.account;
 
 import bank.common.config.dummy.DummyObject;
-import bank.controller.account.dto.AccountRequest;
 import bank.domain.account.dto.AccountCommand;
 import bank.domain.account.dto.AccountResponse;
 import bank.domain.common.exception.CustomGlobalException;
+import bank.domain.transaction.Transaction;
+import bank.domain.transaction.TransactionRepository;
 import bank.domain.user.User;
 import bank.domain.user.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -14,16 +15,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -38,6 +36,9 @@ class AccountServiceTest extends DummyObject {
 
     @Mock
     private AccountRepository accountRepository;
+
+    @Mock
+    private TransactionRepository transactionRepository;
 
     @Test
     @DisplayName("등록된 계자 번호가 없으면 계좌를 등록할 수 있다.")
@@ -115,4 +116,62 @@ class AccountServiceTest extends DummyObject {
         //then
     }
 
+    @Test
+    @DisplayName("ATM으로 입금을 할 수 있다.")
+    void deposit() {
+        //given
+        long number = 1111L;
+        long amount = 100L;
+        String receiver = "이노";
+        String tel = "010-1234-5678";
+
+        AccountCommand.Deposit command = new AccountCommand.Deposit(
+                number, amount, "DEPOSIT", "010-1234-5678");
+        Account account = newMockAccount(1L, number, newMockUser(1L, "ssar", "쌀"), 1000L);
+        when(accountRepository.findByNumber(command.getNumber()))
+                .thenReturn(Optional.of(account));
+
+        Account account1 = newMockAccount(1L, number, newMockUser(1L, "ssar", "쌀"), 1000L);
+        Transaction transaction = newMockDepositTransaction(1L, account1, amount, receiver, tel);
+        when(transactionRepository.save(any())).thenReturn(transaction);
+        //when
+        AccountResponse.Deposit response = accountService.deposit(command);
+        //then
+        Assertions.assertThat(account.getBalance()).isEqualTo(1100L);
+        Assertions.assertThat(transaction.getDepositAccountBalance()).isEqualTo(1100L);
+        Assertions.assertThat(response)
+                .extracting("accountId", "number", "transaction.amount")
+                .containsExactly(1L, number, amount);
+    }
+
+    @Test
+    @DisplayName("")
+    void withdraw() {
+        //given
+        long userId = 1L;
+        long number = 1111L;
+        long password = 1111L;
+        long amount = 100L;
+
+        AccountCommand.Withdraw command = new AccountCommand.Withdraw(
+                number, password, amount, "WITHDRAW");
+        User user = newMockUser(1L, "ssar", "쌀");
+        Account account = Account.builder().id(1L).user(user).number(number).password(password).balance(1000L).build();
+        when(accountRepository.findByNumber(command.getNumber()))
+                .thenReturn(Optional.of(account));
+
+        Account account2 = Account.builder().id(1L).user(user).number(number).password(password).balance(1000L).build();
+
+        Transaction transaction = newMockWithdrawTransaction(1L, account2, amount);
+        when(transactionRepository.save(any())).thenReturn(transaction);
+        //when
+        AccountResponse.Withdraw response = accountService.withdraw(command, userId);
+        //then
+        Assertions.assertThat(account.getBalance()).isEqualTo(900L);
+        System.out.println(transaction.getDepositAccountBalance());
+        Assertions.assertThat(transaction.getWithdrawAccountBalance()).isEqualTo(900L);
+        Assertions.assertThat(response)
+                .extracting("accountId", "number", "transaction.amount")
+                .containsExactly(1L, number, amount);
+    }
 }

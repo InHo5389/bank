@@ -90,4 +90,38 @@ public class AccountResponse {
             }
         }
     }
+
+    @Getter
+    public static class Withdraw{
+        private Long accountId;
+        private Long number;
+        private Long balance;
+        private Withdraw.TransactionDto transaction;
+
+        public Withdraw(Account account, Transaction transaction) {
+            this.accountId = account.getId();
+            this.number = account.getNumber();
+            this.balance = account.getBalance();
+            this.transaction = new Withdraw.TransactionDto(transaction);
+        }
+
+        @Getter
+        public class TransactionDto{
+            private Long id;
+            private String gubun;
+            private String sender;
+            private String receiver;
+            private Long amount;
+            private String createdAt;
+
+            public TransactionDto(Transaction transaction) {
+                this.id = transaction.getId();
+                this.gubun = transaction.getGubun().getValue();
+                this.sender = transaction.getSender();
+                this.receiver = transaction.getReceiver();
+                this.amount = transaction.getAmount();
+                this.createdAt = DateUtil.toStringFormat(transaction.getCreatedAt());
+            }
+        }
+    }
 }
