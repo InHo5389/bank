@@ -2,9 +2,12 @@ package bank.controller.account;
 
 import bank.common.config.dummy.DummyObject;
 import bank.controller.account.dto.AccountRequest;
+import bank.domain.account.Account;
 import bank.domain.account.AccountRepository;
+import bank.domain.account.dto.AccountCommand;
 import bank.domain.user.User;
 import bank.domain.user.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,11 +51,11 @@ class AccountControllerIntergrationTest extends DummyObject {
     private EntityManager em;
 
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         User ssar = userRepository.save(newUser("ssar", "쌀"));
         User cos = userRepository.save(newUser("cos", "코스"));
-        accountRepository.save(newAccount(1111L,ssar));
-        accountRepository.save(newAccount(2222L,cos));
+        accountRepository.save(newAccount(1111L, ssar));
+        accountRepository.save(newAccount(2222L, cos));
         em.clear();
     }
 
@@ -63,7 +66,7 @@ class AccountControllerIntergrationTest extends DummyObject {
     // db에서 usename=ssar을 조회 하여 세션에 담아주는 어노테이션
     // setupBefore=TEST_METHOD(setUp메서드 실행전에 수행됨)
     // TEST_EXECUTION(create() 메서드 실행전에 수행)
-    @WithUserDetails(value = "ssar",setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @WithUserDetails(value = "ssar", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
     @DisplayName("계좌를 등록할수 있다.")
     void create() throws Exception {
@@ -107,7 +110,7 @@ class AccountControllerIntergrationTest extends DummyObject {
         Long number = 1111L;
         //when
         //then
-        mockMvc.perform(delete("/api/s/account/{number}",number))
+        mockMvc.perform(delete("/api/s/account/{number}", number))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("계좌 삭제 완료"));
@@ -116,16 +119,81 @@ class AccountControllerIntergrationTest extends DummyObject {
     @Test
     @DisplayName("본인 계좌를 삭제할때 계자 소유자가 아니면 계좌를 삭제하지 못하고 예외가 발생한다.")
     @WithUserDetails(value = "cos", setupBefore = TestExecutionEvent.TEST_EXECUTION)
-    @WithMockUser(username = "ssar")
     void deleteAccount_fail() throws Exception {
         //given
         Long number = 1111L;
         //when
         //then
-        mockMvc.perform(delete("/api/s/account/{number}",number))
+        mockMvc.perform(delete("/api/s/account/{number}", number))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("해당 계좌 소유자가 아닙니다."));
+    }
+
+    @Test
+    @DisplayName("")
+    void deposit() throws Exception {
+        //given
+        long number = 1111L;
+        long amount = 100L;
+
+        AccountRequest.Deposit request = new AccountRequest.Deposit(
+                number, amount, "DEPOSIT", "010-1234-5678");
+        String requestBody = objectMapper.writeValueAsString(request);
+        //when
+        //then
+        mockMvc.perform(post("/api/account/deposit")
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("입금 완료"));
+    }
+
+    @Test
+    @DisplayName("출금 계좌에 돈이 넉넉할 경우 출금을 할 수 있다.")
+    @WithUserDetails(value = "ssar", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void withdraw() throws Exception {
+        //given
+        long number = 1111L;
+        long password = 1234L;
+        long amount = 100L;
+
+        AccountRequest.Withdraw request = new AccountRequest.Withdraw(
+                number, password, amount, "WITHDRAW");
+        String requestBody = objectMapper.writeValueAsString(request);
+        //when
+        //then
+        mockMvc.perform(post("/api/s/account/withdraw")
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("출금 완료"));
+    }
+
+    @Test
+    @DisplayName("출금 계좌에 돈이 넉넉할 경우 이체를 할 수 있다.")
+    @WithUserDetails(value = "ssar", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    void transfer() throws Exception {
+        //given
+        long withdrawNumber = 1111L;
+        long depositNumber = 2222L;
+        long withdrawPassword = 1234L;
+        long amount = 100L;
+
+        AccountRequest.Transfer request = new AccountRequest.Transfer(
+                withdrawNumber, depositNumber, withdrawPassword, amount, "TRANSFER");
+        String requestBody = objectMapper.writeValueAsString(request);
+        //when
+        //then
+
+        mockMvc.perform(post("/api/s/account/transfer")
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("message").value("이체 완료"));
     }
 
 }

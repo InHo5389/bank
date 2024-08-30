@@ -41,11 +41,34 @@ public class AccountController {
                                            @AuthenticationPrincipal LoginUser loginUser) {
         accountService.delete(number, loginUser.getUser().getId());
 
-        return ApiResponse.ok("계좌 삭제 완료",null);
+        return ApiResponse.ok("계좌 삭제 완료", null);
     }
 
     @PostMapping("/account/deposit")
-    public ApiResponse<AccountResponse.Deposit> deposit(@Valid @RequestBody AccountRequest.Deposit request){
-        return ApiResponse.ok("입금 완료",accountService.deposit(request.toCommand()));
+    public ApiResponse<AccountResponse.Deposit> deposit(@Valid @RequestBody AccountRequest.Deposit request) {
+        return ApiResponse.ok("입금 완료", accountService.deposit(request.toCommand()));
+    }
+
+    @PostMapping("/s/account/withdraw")
+    public ApiResponse<AccountResponse.Withdraw> withdraw(@Valid @RequestBody AccountRequest.Withdraw request,
+                                                          @AuthenticationPrincipal LoginUser loginUser) {
+
+        return ApiResponse.ok("출금 완료", accountService.withdraw(request.toCommand(),loginUser.getUser().getId()));
+    }
+
+    @PostMapping("/s/account/transfer")
+    public ApiResponse<AccountResponse.Transfer> transfer(@Valid @RequestBody AccountRequest.Transfer request,
+                                                          @AuthenticationPrincipal LoginUser loginUser){
+        return ApiResponse.ok("이체 완료",accountService.transfer(request.toCommand(),loginUser.getUser().getId()));
+    }
+
+    @GetMapping("/s/account/{number}")
+    public ApiResponse<AccountResponse.Detail> findDetailAccount(
+            @PathVariable Long accountNumber,
+            @RequestParam(value = "page",defaultValue = "0") Integer page,
+            @AuthenticationPrincipal LoginUser loginUser
+    ){
+        AccountResponse.Detail response = accountService.getDetailAccount(accountNumber, loginUser.getUser().getId(), page);
+        return ApiResponse.ok("계좌 상세 보기",response);
     }
 }
