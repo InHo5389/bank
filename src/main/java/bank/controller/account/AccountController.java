@@ -61,4 +61,14 @@ public class AccountController {
                                                           @AuthenticationPrincipal LoginUser loginUser){
         return ApiResponse.ok("이체 완료",accountService.transfer(request.toCommand(),loginUser.getUser().getId()));
     }
+
+    @GetMapping("/s/account/{number}")
+    public ApiResponse<AccountResponse.Detail> findDetailAccount(
+            @PathVariable Long accountNumber,
+            @RequestParam(value = "page",defaultValue = "0") Integer page,
+            @AuthenticationPrincipal LoginUser loginUser
+    ){
+        AccountResponse.Detail response = accountService.getDetailAccount(accountNumber, loginUser.getUser().getId(), page);
+        return ApiResponse.ok("계좌 상세 보기",response);
+    }
 }

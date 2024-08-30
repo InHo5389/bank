@@ -132,11 +132,22 @@ public class AccountService {
                 .amount(command.getAmount())
                 .gubun(TransactionEnum.TRANSFER)
                 .sender(command.getWithdrawNumber() + "")
-                .receiver(command.getDepositNumber()+"")
+                .receiver(command.getDepositNumber() + "")
                 .build();
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
         return new AccountResponse.Transfer(withdrawAccount, savedTransaction);
+    }
+
+    public AccountResponse.Detail getDetailAccount(Long number, Long userId,Integer page) {
+        String gubun = "ALL";
+
+        Account account = accountRepository.findByNumber(number)
+                .orElseThrow(() -> new CustomGlobalException(ErrorType.NOT_FOUND_ACCOUNT));
+
+        account.checkOwner(userId);
+        List<Transaction> transactionList = transactionRepository.findTransactionList(account.getId(), gubun, page);
+        return new AccountResponse.Detail(account,transactionList);
     }
 }
