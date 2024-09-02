@@ -1,6 +1,6 @@
 package bank.common.util;
 
-import bank.controller.common.response.ApiResponse;
+import bank.controller.common.response.CustomApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class CustomResponseUtil {
 
     public static void fail(HttpServletResponse response, String message, HttpStatus authException) throws IOException {
         try {
-            ApiResponse<?> responseDto = new ApiResponse<>(authException,message,null);
+            CustomApiResponse<?> responseDto = new CustomApiResponse<>(authException,message,null);
             String responseBody = objectMapper.writeValueAsString(responseDto);
             response.setContentType("application/json; charset=utf-8");
             response.setStatus(authException.value());
@@ -29,7 +29,7 @@ public class CustomResponseUtil {
 
     public static void success(HttpServletResponse response,Object dto) throws IOException {
         try {
-            ApiResponse<?> responseDto = new ApiResponse<>(HttpStatus.OK,"로그인 성공",dto);
+            CustomApiResponse<?> responseDto = new CustomApiResponse<>(HttpStatus.OK,"로그인 성공",dto);
             String responseBody = objectMapper.writeValueAsString(responseDto);
             response.setContentType("application/json; charset=utf-8");
             response.setStatus(HttpStatus.OK.value());
@@ -41,7 +41,7 @@ public class CustomResponseUtil {
 
     public static void unAuthentication(HttpServletResponse response, String message) throws IOException {
         try {
-            ApiResponse<?> responseDto = new ApiResponse<>(HttpStatus.UNAUTHORIZED,message,null);
+            CustomApiResponse<?> responseDto = new CustomApiResponse<>(HttpStatus.UNAUTHORIZED,message,null);
             String responseBody = objectMapper.writeValueAsString(responseDto);
             response.setContentType("application/json; charset=utf-8");
             response.setStatus(HttpStatus.UNAUTHORIZED.value());

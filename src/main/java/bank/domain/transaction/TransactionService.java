@@ -1,6 +1,5 @@
 package bank.domain.transaction;
 
-import bank.controller.common.response.ApiResponse;
 import bank.domain.account.Account;
 import bank.domain.account.AccountRepository;
 import bank.domain.common.exception.CustomGlobalException;

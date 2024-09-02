@@ -1,12 +1,11 @@
 package bank.common.handler.aop;
 
-import bank.controller.common.response.ApiResponse;
+import bank.controller.common.response.CustomApiResponse;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -43,7 +42,7 @@ public class CustomValidationAdvice {
                     for (FieldError error : bindingResult.getFieldErrors()) {
                         errorMap.put(error.getField(), error.getDefaultMessage());
                     }
-                    return new ApiResponse<>(
+                    return new CustomApiResponse<>(
                             HttpStatus.BAD_REQUEST,
                             "바인딩 오류",
                             errorMap);

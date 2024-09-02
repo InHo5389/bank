@@ -30,3 +30,8 @@ spring:
 logging:
   level:
     bank: DEBUG
+
+springdoc:
+  show-login-endpoint: true # 스웨거 로그인 url 뜨게하기
+  swagger-ui: # 스웨거 url 바꾸기
+    path: /swagger
