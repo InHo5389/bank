@@ -1,7 +1,7 @@
 package bank.controller.transaction;
 
 import bank.common.config.auth.LoginUser;
-import bank.controller.common.response.ApiResponse;
+import bank.controller.common.response.CustomApiResponse;
 import bank.domain.transaction.TransactionService;
 import bank.domain.transaction.dto.TransactionResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +16,13 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @GetMapping("/s/account/{number}/transaction")
-    public ApiResponse<TransactionResponse.History> findTransactionList(
+    public CustomApiResponse<TransactionResponse.History> findTransactionList(
             @PathVariable Long number,
             @RequestParam(value = "gubun", defaultValue = "ALL") String gubun,
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @AuthenticationPrincipal LoginUser loginUser) {
 
         TransactionResponse.History response = transactionService.getTransactionList(loginUser.getUser().getId(), number, gubun, page);
-        return ApiResponse.ok("입출금 목록 보기",response);
+        return CustomApiResponse.ok("입출금 목록 보기",response);
     }
 }
