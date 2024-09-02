@@ -3,6 +3,8 @@ package bank.common.handler;
 import bank.controller.common.response.CustomApiResponse;
 import bank.domain.common.exception.CustomGlobalException;
 import bank.domain.common.exception.ErrorType;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +28,17 @@ public class CustomExceptionHandler {
         ErrorType errorType = e.getErrorType();
         log.warn("ErrorType: {}, Message: {}", errorType, e.getMessage());
         HttpStatus httpStatus = HttpStatus.valueOf(errorType.getStatus());
-        return new ResponseEntity<>(
-                new CustomApiResponse<>(httpStatus, e.getMessage(), null),
-                httpStatus);
+        return ResponseEntity
+                .status(httpStatus.value())
+                .body(new CustomApiResponse<>(httpStatus, e.getMessage(), null));
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BindException.class)
+    @ApiResponse(
+            responseCode = "400",
+            description = "잘못된 요청 (유효성 검사 실패)"
+    )
     public CustomApiResponse<Object> bindException(BindException e) {
         List<FieldError> fieldErrors = e.getBindingResult().getFieldErrors();
         Map<String, String> errorMap = fieldErrors.stream()

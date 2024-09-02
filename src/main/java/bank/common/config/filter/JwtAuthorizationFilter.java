@@ -3,6 +3,8 @@ package bank.common.config.filter;
 import bank.common.config.auth.LoginUser;
 import bank.common.config.jwt.JwtProcess;
 import bank.common.config.jwt.JwtUtil;
+import bank.common.util.CustomResponseUtil;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +33,14 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         log.debug("JwtAuthorizationFilter.()");
         if (isHeaderVerify(request,response)){
             String token = request.getHeader(JwtUtil.Header).replace(JwtUtil.TOKEN_PREFIX, "");
-            LoginUser loginUser = JwtProcess.verify(token);
+
+            LoginUser loginUser = null;
+            try {
+                loginUser = JwtProcess.verify(token);
+            }catch (JWTDecodeException e){
+                CustomResponseUtil.unAuthentication(response,"토큰이 유효하지 않습니다.");
+                return;
+            }
 
             // 임시 세션 에는 UserDetails 타입이나 username을 담을수 있음
             // 핵심은 role을 잘 집어넣어

@@ -1,6 +1,7 @@
 package bank.controller.account.dto;
 
 import bank.domain.account.dto.AccountCommand;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,11 +17,13 @@ public class AccountRequest {
         @NotNull
         // 사이즈로 하면 안됨, 사이즈는 string한테 하는 것
         // 최대 4자리 까지(임시)
-        @Digits(integer = 4, fraction = 4)
+        @Digits(integer = 4, fraction = 4,message = "계좌번호는 4자리만 사용 가능하다.")
+        @Schema(description = "계좌 번호",example = "1234")
         private Long number;
 
         @NotNull
-        @Digits(integer = 4, fraction = 4)
+        @Digits(integer = 4, fraction = 4,message = "계좌 비밀 번호는 4자리만 사용 가능하다.")
+        @Schema(description = "계좌 비밀 번호",example = "1234")
         private Long password;
 
         public AccountCommand.Create toCommand() {

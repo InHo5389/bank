@@ -6,6 +6,7 @@ import bank.domain.transaction.Transaction;
 import bank.domain.transaction.dto.TransactionResponse;
 import bank.domain.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

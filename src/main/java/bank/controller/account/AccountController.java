@@ -6,6 +6,10 @@ import bank.controller.common.response.CustomApiResponse;
 import bank.domain.account.AccountService;
 import bank.domain.account.dto.AccountResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,16 +21,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class AccountController {
+public class AccountController implements AccountApiSpecification{
 
     private final AccountService accountService;
 
     @PostMapping("/s/account")
-    @Operation(summary = "계좌 생성", description = "계좌를 생성한다.")
-    @ApiResponses(value = {
-            @io.swagger.v3.oas.annotations.responses.ApiResponse
-    }
-    )
     public CustomApiResponse<AccountResponse.Create> create(@Valid @RequestBody AccountRequest.Create request,
                                                             @AuthenticationPrincipal LoginUser loginUser) {
         AccountResponse.Create response = accountService.createAccount(request.toCommand(), loginUser.getUser().getId());
